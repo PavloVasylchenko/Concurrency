@@ -1,5 +1,5 @@
-# Concurrency
-Testing concurrency
+# Concurrency task  
+Currently it fails and need to be fixed in pull request. 
 
 # Run instructions
 javac -d out src/**/*.java   
