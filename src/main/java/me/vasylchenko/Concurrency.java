@@ -18,13 +18,27 @@ public class Concurrency {
 
     private static final int THREADS = 4;
 
-    private static final ThreadLocal<Integer> delay = new ThreadLocal<>();
+    private static final ThreadLocal<Integer> delay = ThreadLocal.withInitial(() -> new Random().nextInt(1000));
 
     static AtomicInteger statsValue = new AtomicInteger();
     static AtomicInteger linesValue = new AtomicInteger();
 
     public static void main(String[] args) throws IOException, InterruptedException {
         long l = System.currentTimeMillis();
+        implementMe();
+        System.out.println("Time: " + (System.currentTimeMillis() - l));
+        System.out.println("Expected: " + (statsValue.get() / THREADS));
+    }
+
+    /**
+     * This method need to be implemented.
+     * All lines need to be processed as fast as possible without changing other methods
+     * Service should consume not more then 10M Xmx memory with provided file.
+     * Current implementation works as expected except memory consumption
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private static void implementMe() throws IOException, InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(THREADS);
         Files.lines(Path.of("file.txt")).forEach(line -> {
             linesValue.incrementAndGet();
@@ -35,8 +49,6 @@ public class Concurrency {
         });
         executorService.shutdown();
         executorService.awaitTermination(1, TimeUnit.DAYS);
-        System.out.println("Time: " + (System.currentTimeMillis() - l));
-        System.out.println("Expected: " + (statsValue.get() / THREADS));
     }
 
     /**
@@ -47,14 +59,9 @@ public class Concurrency {
      */
     private static String translate(String input) {
         try {
-            Integer integer = delay.get();
-            if (integer == null) {
-                int i = new Random().nextInt(1000);
-                integer = i;
-                delay.set(integer);
-            }
-            statsValue.addAndGet(integer);
-            Thread.sleep(integer);
+            Integer millis = delay.get();
+            statsValue.addAndGet(millis);
+            Thread.sleep(millis);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
