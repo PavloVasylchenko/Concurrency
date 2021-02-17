@@ -1,5 +1,10 @@
 # Concurrency task  
-Currently it fails and need to be fixed in pull request. 
+Provided file need to be processed via translate method as fast as possible with provided limitations.
+Currently it fails because of memory limitation and need to be fixed in pull request.
+
+# Limitations
+Application need to consume less memory than provided file.
+Translate api allow 4 parallel calls only.
 
 # Run instructions
 javac -d out src/**/*.java   
